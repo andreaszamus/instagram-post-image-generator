@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "build-webpage":  "ng build --base-href https://andreaszamus.github.io/instagram-post-image-generator/"
   },
   "private": true,
   "dependencies": {

@@ -1,22 +1,32 @@
-import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, Input, ViewChild} from '@angular/core';
 import {CommonModule, NgOptimizedImage} from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import {AngularCropperjsModule, CropperComponent} from 'angular-cropperjs';
 import {HttpClient, HttpClientModule, HttpHeaders, HttpResponse} from '@angular/common/http';
+import {FormsModule} from "@angular/forms";
 
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, AngularCropperjsModule, NgOptimizedImage, HttpClientModule],
+  imports: [CommonModule, RouterOutlet, AngularCropperjsModule, NgOptimizedImage, HttpClientModule, FormsModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.less'
 })
 export class AppComponent implements AfterViewInit {
-  image = 'assets/icon.jpg'
-  final: string = ''
+
+  // image variables
+  image = 'assets/icon.png'
+  croppedImage: string = ''
   previewImage: any
   res = 'assets/Untitled.png'
+
+  // text variables
+  @Input() username: string = ''
+  @Input() location: string = ''
+  @Input() description: string = ''
+  @Input() date: string = ''
+
 
   constructor(private http: HttpClient) { }
 
@@ -63,12 +73,12 @@ export class AppComponent implements AfterViewInit {
     }
   }
 
-  cutImage() {
-    this.final = this.angularCropper.cropper.getCroppedCanvas({
+  cropImage() {
+    this.croppedImage = this.angularCropper.cropper.getCroppedCanvas({
       width: 820,
       height: 820
     }).toDataURL();
-    this.previewImage = this.final;
+    this.previewImage = this.croppedImage;
     this.step3.nativeElement.click();
   };
 
@@ -76,7 +86,8 @@ export class AppComponent implements AfterViewInit {
     this.step4.nativeElement.click();
   }
 
-  addedTexts() {
+  addTexts() {
+    console.log(this.username)
     this.step5.nativeElement.click();
   }
 
@@ -85,14 +96,19 @@ export class AppComponent implements AfterViewInit {
       'Content-Type' : 'application/json',
     });
     let data = {
-      image: this.final,
-      a2: "10"
+      'image': this.croppedImage,
+      'username': this.username,
+      'location': this.location,
+      'description': this.description,
+      'date': this.date
     }
-    this.http.post('https://hrsvkzwzlovrlophkbk4w6fkzq0imhmc.lambda-url.us-east-1.on.aws/', data, { headers,  observe: 'body', responseType: 'text'}).subscribe(data => {
+    this.http.post(
+        'https://hrsvkzwzlovrlophkbk4w6fkzq0imhmc.lambda-url.us-east-1.on.aws/',
+        data,
+        { headers,  observe: 'body', responseType: 'text'}).subscribe(data => {
       console.log(data);
       this.res = data
     })
   }
-
 }
 
