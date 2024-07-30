@@ -4,6 +4,7 @@ import { RouterOutlet } from '@angular/router';
 import {AngularCropperjsModule, CropperComponent} from 'angular-cropperjs';
 import {HttpClient, HttpClientModule, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {FormsModule} from "@angular/forms";
+import { isDevMode } from '@angular/core';
 
 
 @Component({
@@ -102,8 +103,15 @@ export class AppComponent implements AfterViewInit {
       'description': this.description,
       'date': this.date
     }
+
+    let backend_url = ""
+    if (isDevMode()) {
+      backend_url = 'http://localhost:5000/test'
+    } else {
+      backend_url = 'https://hrsvkzwzlovrlophkbk4w6fkzq0imhmc.lambda-url.us-east-1.on.aws/'
+    }
     this.http.post(
-        'https://hrsvkzwzlovrlophkbk4w6fkzq0imhmc.lambda-url.us-east-1.on.aws/',
+        backend_url,
         data,
         { headers,  observe: 'body', responseType: 'text'}).subscribe(data => {
       console.log(data);

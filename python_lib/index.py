@@ -1,0 +1,102 @@
+# python -m venv .venv
+# .venv\Scripts\activate
+# python -m flask --app index run
+
+from flask import Flask
+from flask_cors import CORS, cross_origin
+from flask import request
+
+from PIL import Image, ImageDraw, ImageFont, ImageOps
+from io import BytesIO
+import base64
+import re
+import json
+
+app = Flask(__name__)
+CORS(app)
+is_local = False
+
+
+def lambda_handler(event, context):
+    data = json.loads(event['body'])
+    image_as_string = data['image']
+    image_data = re.sub('^data:image/.+;base64,', '', image_as_string)
+    photo = Image.open(BytesIO(base64.b64decode(image_data)))
+    image = Image.open('base2.png')
+    image_draw = ImageDraw.Draw(image)
+
+    colour = [
+        (76, 76, 78),  # dark grey
+        (165, 168, 171),  # light grey
+    ]
+
+    # icon
+    mask = Image.open('mask.png').convert('L')
+    icon = Image.open('icon.png')
+    output = ImageOps.fit(icon, mask.size, centering=(0.5, 0.5))
+    output.putalpha(mask)
+    o1 = output.resize((80, 80))
+    image.paste(o1, (51, 42), o1)
+
+    # username
+    username_font = ImageFont.truetype('OpenSans.ttf', 31)
+    image_draw.text((159, 42), data['username'], font=username_font, fill=colour[0])
+
+    # location
+    location_font = ImageFont.truetype('OpenSans.ttf', 24)
+    image_draw.text((159, 82), data['location'], font=location_font, fill=colour[0])
+
+    # photo
+    image.paste(photo.resize((820, 820)), (52, 142))
+
+    # description
+    description_font = ImageFont.truetype('OpenSans.ttf', 31)
+    text = data['description']
+
+    limit = 54
+    text_split = text.split()
+    final = ''
+    line = ''
+    for word in text_split:
+        if len(line + word + ' ') < limit:
+            line += word + ' '
+        else:
+            final += line + '\n'
+            line = ''
+    if line != '':
+        final += line
+
+    image_draw.text((52, 1055), final, font=description_font, fill=colour[0])
+
+    # date
+    date_font = ImageFont.truetype('OpenSans.ttf', 21)
+    image_draw.text((52, 1227), data['date'], font=date_font, fill=colour[1])
+
+    final_route = "final.png"
+    if is_local:
+        pass
+    else:
+        final_route = f'/tmp/{final_route}'
+
+    image.save(final_route)
+    response = Image.open(final_route)
+    buffered = BytesIO()
+    response.save(buffered, format="PNG")
+    img_str = base64.b64encode(buffered.getvalue())
+    if is_local:
+        return f'data:image/png;base64, {img_str.decode("utf-8")}'
+    else:
+        return {
+            'statusCode': 200,
+            'body': f'data:image/png;base64, {img_str.decode("utf-8")}'
+        }
+
+
+@app.route("/test",  methods=['GET', 'POST'])
+def hello_world():
+    global is_local
+    is_local = True
+    event = {
+        'body': request.data
+    }
+    return lambda_handler(event, None)
