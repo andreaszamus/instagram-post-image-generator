@@ -27,7 +27,16 @@
                     </h2>
                     <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
                         <div class="accordion-body">
-                            <input type="file" (change)="selectFile($event)" accept="image/jpeg">
+                            <div
+                              class="drop-zone"
+                              (drop)="onDrop($event)"
+                              (dragover)="onDragOver($event)"
+                              (dragleave)="onDragLeave($event)"
+                            >
+                              <p>Arrastra una imagen aquí</p>
+                              <input type="file" multiple (change)="onFileSelect($event)" hidden #fileInput />
+                              <button (click)="fileInput.click()">Navegar archivos</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -121,7 +130,10 @@
                     </h2>
                     <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
                         <div class="accordion-body">
-                            <button class="btn btn-primary" (click)="postImage()">Enviar</button>
+                            <div class="d-grid gap-2 d-md-flex">
+                              <button class="btn btn-success me-md-2" (click)="postImage()">Enviar</button>
+                              <button [disabled]="!is_available_for_download" class="btn btn-primary me-md-2" (click)="downloadImage()">Descargar</button>
+                            </div>
                         </div>
                     </div>
                 </div>

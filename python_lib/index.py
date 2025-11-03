@@ -14,7 +14,7 @@ import json
 
 app = Flask(__name__)
 CORS(app)
-is_local = False
+is_local = True
 
 
 def lambda_handler(event, context):
@@ -51,20 +51,28 @@ def lambda_handler(event, context):
 
     # description
     description_font = ImageFont.truetype('OpenSans.ttf', 31)
-    text = data['description']
+    description_text = data['description']
 
     limit = 54
-    text_split = text.split()
+
+    sentence_split = re.split(r'\n|\r', description_text)
+
     final = ''
     line = ''
-    for word in text_split:
-        if len(line + word + ' ') < limit:
-            line += word + ' '
+    for sentence in sentence_split:
+        if len(sentence) +1 < limit:
+            line = sentence + '\n'
+            final += line
         else:
-            final += line + '\n'
-            line = ''
-    if line != '':
-        final += line
+            word_split = sentence.split()
+            for word in word_split:
+                if len(line + word + ' ') < limit:
+                    line += word + ' '
+                else:
+                    final += line + '\n'
+                    line = ''
+            if line != '':
+                final += line
 
     image_draw.text((52, 1055), final, font=description_font, fill=colour[0])
 

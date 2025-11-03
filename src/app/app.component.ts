@@ -1,10 +1,11 @@
-import {AfterViewInit, Component, ElementRef, Input, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, Inject, Input, ViewChild} from '@angular/core';
 import {CommonModule, NgOptimizedImage} from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import {AngularCropperjsModule, CropperComponent} from 'angular-cropperjs';
 import {HttpClient, HttpClientModule, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {FormsModule} from "@angular/forms";
-import { isDevMode } from '@angular/core';
+import { isDevMode, LOCALE_ID } from '@angular/core';
+import { formatDate } from '@angular/common';
 
 
 @Component({
@@ -23,13 +24,15 @@ export class AppComponent implements AfterViewInit {
   res = 'assets/Untitled.png'
 
   // text variables
-  @Input() username: string = ''
-  @Input() location: string = ''
+  @Input() username: string = 'Andy y Pili'
+  @Input() location: string = 'Bogotá'
   @Input() description: string = ''
-  @Input() date: string = ''
+  @Input() date: string = '05-SEP-2015'
 
+  // button logic
+  is_available_for_download: boolean = false
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, @Inject(LOCALE_ID) private locale: string) { }
 
   @ViewChild('angularCropper') public angularCropper: CropperComponent;
 
@@ -48,25 +51,57 @@ export class AppComponent implements AfterViewInit {
     }
   }
 
-  selectFile(event: any) {
-    if(!event.target.files[0] || event.target.files[0].length == 0) {
-      return;
-    }
+  // drag-and-drop vars
+  files: File[] = [];
 
-    console.log(event.target.files[0].size)
-    if(event.target.files[0].size > 2000000){
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (event.dataTransfer?.files) {
+      for (let i = 0; i < event.dataTransfer.files.length; i++) {
+        this.files.push(event.dataTransfer.files[i]);
+      }
+    }
+    this.processImage()
+  }
+
+  onFileSelect(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files) {
+      for (let i = 0; i < input.files.length; i++) {
+        this.files.push(input.files[i]);
+      }
+    }
+    this.processImage()
+  }
+
+  // process image after selected
+  processImage(){
+    console.log(this.files[0])
+    if(this.files[0].size > 5000000){
       alert("File is too big!");
       return;
     }
 
-    const mimeType = event.target.files[0].type;
+    const mimeType = this.files[0].type;
 
     if (mimeType.match(/image\/*/) == null) {
       return;
     }
 
-    var reader = new FileReader();
-    reader.readAsDataURL(event.target.files[0]);
+    let reader = new FileReader();
+    reader.readAsDataURL(this.files[0]);
     reader.onload = (_event) => {
       this.previewImage = reader.result;
       this.image = this.previewImage
@@ -108,15 +143,23 @@ export class AppComponent implements AfterViewInit {
     if (isDevMode()) {
       backend_url = 'http://localhost:5000/test'
     } else {
-      backend_url = 'https://hrsvkzwzlovrlophkbk4w6fkzq0imhmc.lambda-url.us-east-1.on.aws/'
+      backend_url = ''
     }
     this.http.post(
         backend_url,
         data,
         { headers,  observe: 'body', responseType: 'text'}).subscribe(data => {
-      console.log(data);
       this.res = data
+      this.is_available_for_download = true
     })
   }
-}
 
+  downloadImage() {
+    const link = document.createElement('a');
+    link.href = this.res;
+    let currentDateTime: Date = new Date();
+    link.download = formatDate(currentDateTime, 'dd-MM-yyyy-hh:mm:ss', this.locale) + ".png"
+    link.click();
+  }
+
+}
