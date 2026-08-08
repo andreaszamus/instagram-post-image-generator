@@ -44,10 +44,10 @@ export class AppComponent implements AfterViewInit {
 
   ngAfterViewInit () {
     this.angularCropper.cropperOptions = {
-      aspectRatio: 1,
+      aspectRatio: 0.72,
       responsive: true,
-      minContainerWidth: 500,
-      minContainerHeight: 500
+      minContainerWidth: 440,
+      maintainAspectRatio: true
     }
   }
 
@@ -89,7 +89,7 @@ export class AppComponent implements AfterViewInit {
   // process image after selected
   processImage(){
     console.log(this.files[0])
-    if(this.files[0].size > 5000000){
+    if(this.files[0].size > 50000000){
       alert("File is too big!");
       return;
     }
@@ -111,8 +111,8 @@ export class AppComponent implements AfterViewInit {
 
   cropImage() {
     this.croppedImage = this.angularCropper.cropper.getCroppedCanvas({
-      width: 820,
-      height: 820
+      width: 880,
+      height: 1220
     }).toDataURL();
     this.previewImage = this.croppedImage;
     this.step3.nativeElement.click();

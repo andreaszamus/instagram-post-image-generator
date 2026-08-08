@@ -28,7 +28,10 @@ def lambda_handler(event, context):
     colour = [
         (76, 76, 78),  # dark grey
         (165, 168, 171),  # light grey
+        (255, 255, 255) # white
     ]
+    # photo
+    image.paste(photo.resize((880, 1220)), (25, 25))
 
     # icon
     mask = Image.open('mask.png').convert('L')
@@ -40,14 +43,11 @@ def lambda_handler(event, context):
 
     # username
     username_font = ImageFont.truetype('OpenSans.ttf', 31)
-    image_draw.text((159, 42), data['username'], font=username_font, fill=colour[0])
+    image_draw.text((159, 42), data['username'], font=username_font, fill=colour[2])
 
     # location
     location_font = ImageFont.truetype('OpenSans.ttf', 24)
-    image_draw.text((159, 82), data['location'], font=location_font, fill=colour[0])
-
-    # photo
-    image.paste(photo.resize((820, 820)), (52, 142))
+    image_draw.text((159, 82), data['location'], font=location_font, fill=colour[2])
 
     # description
     description_font = ImageFont.truetype('OpenSans.ttf', 31)
@@ -77,8 +77,14 @@ def lambda_handler(event, context):
     image_draw.text((52, 1055), final, font=description_font, fill=colour[0])
 
     # date
-    date_font = ImageFont.truetype('OpenSans.ttf', 21)
-    image_draw.text((52, 1227), data['date'], font=date_font, fill=colour[1])
+    date_font = ImageFont.truetype('OpenSans.ttf', 23)
+    image_draw.text((52, 1252), data['date'], font=date_font, fill=colour[1])
+
+    # lines
+    image_draw.line([(0, 0), (0, 1343)], fill=colour[1], width=1) # left
+    image_draw.line([(0, 0), (931, 0)], fill=colour[1], width=1) # up
+    image_draw.line([(930, 0), (930, 1342)], fill=colour[1], width=1)  # right
+    image_draw.line([(0, 1342), (930, 1342)], fill=colour[1], width=1)  # down
 
     final_route = "final.png"
     if is_local:
