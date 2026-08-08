@@ -31,7 +31,7 @@ def lambda_handler(event, context):
         (255, 255, 255) # white
     ]
     # photo
-    image.paste(photo.resize((880, 1220)), (25, 25))
+    image.paste(photo.resize((880, 1122)), (25, 25))
 
     # icon
     mask = Image.open('mask.png').convert('L')
@@ -74,11 +74,11 @@ def lambda_handler(event, context):
             if line != '':
                 final += line
 
-    image_draw.text((52, 1055), final, font=description_font, fill=colour[0])
+    image_draw.text((25, 1160), final, font=description_font, fill=colour[0])
 
     # date
-    date_font = ImageFont.truetype('OpenSans.ttf', 23)
-    image_draw.text((52, 1252), data['date'], font=date_font, fill=colour[1])
+    date_font = ImageFont.truetype('OpenSans.ttf', 28)
+    image_draw.text((25, 1282), data['date'], font=date_font, fill=colour[1])
 
     # lines
     image_draw.line([(0, 0), (0, 1343)], fill=colour[1], width=1) # left

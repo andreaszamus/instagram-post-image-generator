@@ -44,10 +44,10 @@ export class AppComponent implements AfterViewInit {
 
   ngAfterViewInit () {
     this.angularCropper.cropperOptions = {
-      aspectRatio: 0.72,
+      aspectRatio: 0.78,
       responsive: true,
       minContainerWidth: 440,
-      maintainAspectRatio: true
+      viewMode: 1
     }
   }
 
@@ -112,7 +112,7 @@ export class AppComponent implements AfterViewInit {
   cropImage() {
     this.croppedImage = this.angularCropper.cropper.getCroppedCanvas({
       width: 880,
-      height: 1220
+      height: 1022
     }).toDataURL();
     this.previewImage = this.croppedImage;
     this.step3.nativeElement.click();
