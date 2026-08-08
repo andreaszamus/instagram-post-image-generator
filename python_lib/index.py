@@ -43,11 +43,11 @@ def lambda_handler(event, context):
 
     # username
     username_font = ImageFont.truetype('OpenSans.ttf', 31)
-    image_draw.text((159, 42), data['username'], font=username_font, fill=colour[2])
+    image_draw.text((145, 42), data['username'], font=username_font, fill=colour[2])
 
     # location
     location_font = ImageFont.truetype('OpenSans.ttf', 24)
-    image_draw.text((159, 82), data['location'], font=location_font, fill=colour[2])
+    image_draw.text((145, 82), data['location'], font=location_font, fill=colour[2])
 
     # description
     description_font = ImageFont.truetype('OpenSans.ttf', 31)

@@ -112,7 +112,7 @@ export class AppComponent implements AfterViewInit {
   cropImage() {
     this.croppedImage = this.angularCropper.cropper.getCroppedCanvas({
       width: 880,
-      height: 1022
+      height: 1122
     }).toDataURL();
     this.previewImage = this.croppedImage;
     this.step3.nativeElement.click();
